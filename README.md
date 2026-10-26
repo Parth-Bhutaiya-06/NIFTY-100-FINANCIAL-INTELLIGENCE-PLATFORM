@@ -686,3 +686,55 @@ Adani University
 # 📄 License
 
 This project is developed for educational and internship purposes.
+
+---
+
+# 🎓 Internship Expansion — Explainable Analytics, Peer Benchmarking & Automated Reporting
+
+Adds five modules on top of the existing platform. All calculations are deterministic
+(no paid AI services, no price prediction). See `UPDATES_CHANGELOG.txt` for the exact list of
+files added and changed.
+
+| Module | Code | What it does |
+|---|---|---|
+| 1. Data quality monitoring | `src/quality/` | Finds missing values, duplicate records, inconsistent periods and invalid metrics, each with a severity |
+| 2. Explainable analytics | `src/analytics/financial_metrics.py`, `health_score.py` | Transparent indicators and a documented 0-100 health score with a per-metric breakdown |
+| 3. Peer benchmarking | `src/analytics/benchmarking.py` | Company vs peer median, percentile and rank (curated peer group, else broad sector) |
+| 4. Automated PDF reports | `src/reports/research_report.py` | KPIs, charts, peer comparison, methodology and data-quality warnings |
+| 5. Automated testing | `tests/quality`, `tests/analytics`, `tests/reports`, `tests/dashboard` | 150+ new tests including dashboard smoke tests |
+
+### Health score in one paragraph
+Eight metrics in four pillars (Profitability 30, Leverage 25, Growth 25, Cash quality 20).
+Each metric earns 0-100 points by straight-line interpolation between two documented thresholds;
+points are weighted and added. Missing or implausible metrics are dropped and the remaining
+weights re-scaled (coverage is reported; below 50% the score is withheld). Banks, NBFCs and
+insurers are not scored on leverage, interest coverage, operating margin or cash conversion.
+Grades: A 75+, B 60+, C 45+, D 30+, E below 30. Thresholds are in
+`src/analytics/health_score.py` and on the methodology page of every PDF.
+
+### Run it
+```
+pip install -r requirements.txt
+make dashboard                       # new pages: "Health & Peer Benchmark", "Data Quality"
+make quality                         # writes output/data_quality_report.csv
+make research-report TICKER=TCS      # one PDF -> reports/research/
+make research-reports-all            # all 92 PDFs
+python -m pytest                     # full test suite
+```
+
+### Screenshots
+`docs/screenshots/` — score breakdown, peer benchmark, sector league, data-quality monitor.
+
+### Data findings (from the data-quality monitor on the shipped database)
+* Statement tables contain company ids that are not in the 92-company master list
+  (e.g. WIPRO, VEDL, ZOMATO) - reported as `orphan_company_id` errors.
+* Period labels are mixed (`Mar 2024`, `Mar-24`, `2024`, `TTM`, `2024.5`); a shared parser normalises them.
+* `Sep 2024` half-year balance-sheet rows sit beside `Mar` annual rows; they are detected as
+  off-cycle and excluded from annual analytics.
+* Some stored ROE values are impossible (e.g. BEL above 4,000%); they are excluded from scoring
+  and shown as a caveat instead of being silently used.
+* Some `expenses` / `operating_profit` values break the accounting identity; flagged as warnings.
+
+### Known limitation
+3 older tests in `tests/api` fail on a fresh clone because `output/cluster_labels.csv` is
+git-ignored (`output/*.csv`). Run the Sprint 6 clustering step first to generate it.

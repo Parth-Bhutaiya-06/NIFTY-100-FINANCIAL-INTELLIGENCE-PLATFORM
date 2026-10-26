@@ -9,6 +9,8 @@ from pages import (
     sectors,
     capital,
     reports,
+    health_benchmark,
+    data_quality,
 )
 from utils.theme import apply_global_theme, render_sidebar_nav
 
@@ -62,6 +64,9 @@ PAGES = {
     "sectors": {"label": "Sector Analysis", "icon": "🏭", "func": sectors.show},
     "capital": {"label": "Capital Allocation", "icon": "💰", "func": capital.show},
     "reports": {"label": "Annual Reports", "icon": "📄", "func": reports.show},
+    # Internship expansion modules
+    "health": {"label": "Health & Peer Benchmark", "icon": "🩺", "func": health_benchmark.show},
+    "quality": {"label": "Data Quality", "icon": "🧪", "func": data_quality.show},
 }
 
 selected_key = render_sidebar_nav(PAGES)

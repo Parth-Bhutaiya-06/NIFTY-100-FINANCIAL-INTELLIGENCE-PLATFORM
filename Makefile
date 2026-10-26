@@ -16,7 +16,7 @@ report:
 	python src/etl/review_summary.py
 
 dashboard:
-	@echo Dashboard module will be implemented in a later sprint.
+	cd src/dashboard && streamlit run app.py
 
 api:
 	@echo API module will be implemented in a later sprint.
@@ -26,3 +26,13 @@ ratios:
 
 clean:
 	@echo Cleaning output folder...
+
+# ---- Internship expansion ----
+quality:
+	python -m src.quality.data_quality
+
+research-report:
+	python -m src.reports.research_report $(TICKER)
+
+research-reports-all:
+	python -m src.reports.research_report --all
